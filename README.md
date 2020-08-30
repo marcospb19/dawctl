@@ -1,9 +1,20 @@
 # dawctl
-A device manager to control Razer's DeathAdder Essential White Edition mouse parameters in Linux (sensor DPI, frequency and white ligthing).
+Device manager to control Razer's DeathAdder Essential White Edition mouse **parameters** in _Linux_.
+
+It's called dawctl because it is for the DAW (DeathAdder White edition).
+
+Features:
+- Automatic detection of the DAW.
+- Flags:
+  - --dpi: Sets the sensor DPI, from 200 up to 6400.
+  - --light: Sets the brightness level of the light in the wheel and logo, from 0 up to 100.
+  - --frequency: Changes the sensor frequency, 500 Hz or 1000 Hz.
+  - --path: Path to the device, overwrites the automatic detection feature.
+
+---
 
 This manager was made by reverse engineering of the official razer synapse USBHID communication, using wireshark and exporting captures via .JSON, files used for analysis written in Python are in the folder reverse\_engineering/.
 
-It's called dawctl because it is for the DAW (DeathAdder White).
 
 The unsafe USBHID communication with crazy dark magic with bytes comes from https://github.com/9ary/da2013ctl, the CLI was also totally reworked.
 
@@ -14,7 +25,6 @@ TODO:
 - breathing ligthing effect!
 
 ### Installation
-
 Please, keep in mind that I have yet to do the tests in different Linux distros, this SECTION IS A SCRATCH, and will change soon with update installation instructions.
 
 ```sh
@@ -29,26 +39,13 @@ Create the group `razer` and add yourself to it then:
 # udevadm trigger
 ```
 
-### Help
-```sh
-USAGE:
-    dawctl [OPTIONS]
-
-FLAGS:
-    -h, --help       Display help information.
-    -V, --version    Display version information.
-
-OPTIONS:
-    -l, --light <BRIGHTNESS_LEVEL>    Brightness level of the wheel and logo. [0-100]
-    -d, --dpi <DPI>                   Sensor DPI (200 up to 6400).
-    -f, --frequency <FREQUENCY>       Sensor frequency in Hz. [possible values: 500, 1000]
-    -p, --path <PATH>                 Path to the hidraw node. (example: /dev/hidraw3)
-```
+### Help (v0.1)
+![help_image](https://user-images.githubusercontent.com/38900226/91664272-72e01880-eac4-11ea-8a41-8f03c463c520.png)
 
 ### Examples
 ```sh
-dawctl -l 50 # Set brightness
-dawctl -d 3200 # Set dpi
-dawctl --light 0 --dpi 600 --frequency 1000 # Brightness, dpi and frequency
-dawctl --path /dev/hidraw2 -l 100 -d 1000 # Path too
+dawctl -l 50
+dawctl -d 3200
+dawctl --light 0 --dpi 600 --frequency 1000
+dawctl --path /dev/hidraw2 -l 100 -d 1000
 ```
