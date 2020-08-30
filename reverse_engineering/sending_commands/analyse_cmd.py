@@ -1,3 +1,4 @@
+# Uncomment lines at the end of this file
 import json, glob
 
 debug = False
@@ -20,9 +21,6 @@ def load_frame_valid_data_from_file(path: str):
             valid_data.append(data)
 
     return valid_data
-
-#
-#
 
 def show_bytes_sample_from_data_from_file(file_prefix, show_bits = False):
     print(f'--- Start of {file_prefix} ---')
@@ -64,60 +62,27 @@ def show_bytes_sample_from_data_from_file(file_prefix, show_bits = False):
     if debug:
         print(len(data))
 
+    # Remove all contiguous repetition
     to_pop = []
     for i in range(1, len(data)):
         if data[i] == data[i - 1]:
             to_pop.append(i)
-
     for i in reversed(to_pop):
         data.pop(i)
 
-    new = []
-
     for i in range(len(data)):
-        newnew = []
-        for j in range(len(data[i])):
-            newnew.append('{:08b}'.format(int(data[i][j], 16)))
-        new.append(newnew)
-
-    # for i in range(len(data)):
-    #     for j in range(5 - 1, 5 + 9):
-    #         print(data[i][j], end=' ')
-    #     print(f' | footer: {data[i][-3:]}')
-    #     if show_bits:
-    #         for j in range(5, 5 + 8):
-    #             print(new[i][j], end=' ')
-
-    show_bits = True
-    lala = []
-    for i in range(len(data)):
-        for j in range(5- 1, 5 + 9):
+        for j in range(5 - 1, 5 + 9):
             print(data[i][j], end=' ')
-        print(f' | footer: {data[i][-2]}')
-    #     if show_bits:
-    #         # for j in range(9, 11):
-    #         print()
+        print(f' | footer: {data[i][-3:]}')
+        if show_bits:
+            for j in range(5, 5 + 8):
+                print('{:08b}'.format(int(data[i][j], 16)), end=' ')
+            print()
 
-    #         lala.append(int(new[i][10][:4], 2))
-    #         for j in range(5, 5 + 9):
-    #             print(new[i][j], end=' ')
-
-    # [print(e, end=' ') for e in lala]
-    # print()
-
-    # for i in range(len(data)):
-    #     for j in range(5 - 1, 5 + 9):
-    #         print(data[i][j], end=' ')
-    #     print()
-    #     # print("   {:08b}".format(int(data[i][j], 16)) , 200 + 100 * i)
-    #     print(f'footer: {data[i][-3:],16}')
-    #     # print(f'footer: {"{:08b}".format(int(data[i][-2],16))}')
-    #     # if show_bits:
-    #     #     for j in range(5, 5 + 8):
-    #     #         print(new[i][j], end=' ')
-    # print(f'--- End of {file_prefix} ---')
+    print(f'--- End of {file_prefix} ---')
 
 
-# show_bytes_sample_from_data_from_file('set_freq')
-show_bytes_sample_from_data_from_file('full')
-# show_bytes_sample_from_data_from_file('brightness')
+# Uncomment this lines
+# show_bytes_sample_from_data_from_file('frequency', False)
+# show_bytes_sample_from_data_from_file('dpi', False)
+# show_bytes_sample_from_data_from_file('brightness', False)

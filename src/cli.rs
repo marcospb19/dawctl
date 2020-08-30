@@ -3,9 +3,9 @@ use clap::*;
 pub(crate) fn parse_args() -> clap::ArgMatches<'static> {
     App::new(crate_name!())
         .version(crate_version!())
-        .author(crate_authors!())
         .about(crate_description!())
         .help_message("Display help information.")
+        .after_help("Please, contribute and leave issues at https://github.com/marcospb19/dawctl")
         .version_message("Display version information.")
         .settings(&[AppSettings::ColoredHelp])
         .arg(
