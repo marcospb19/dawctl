@@ -13,6 +13,14 @@ Features:
 
 ---
 
+Lighting (0% and 35%):
+<p float="left">
+  <img src="https://user-images.githubusercontent.com/38900226/91668112-36221a80-eae0-11ea-8598-c03c9168812c.png" width="30%" />
+  <img src="https://user-images.githubusercontent.com/38900226/91668105-27d3fe80-eae0-11ea-8bae-2cceb886cf92.png" width="30%" />
+</p>
+
+---
+
 This manager was made by reverse engineering of the official razer synapse USBHID communication, using wireshark and exporting captures via .JSON, files used for analysis written in Python are in the folder reverse\_engineering/.
 
 
@@ -49,3 +57,7 @@ dawctl -d 3200
 dawctl --light 0 --dpi 600 --frequency 1000
 dawctl --path /dev/hidraw2 -l 100 -d 1000
 ```
+
+---
+
+I started this project because I really needed to control the DPI on my mouse, and turn this light off when up late in the night so I won't go blind.
