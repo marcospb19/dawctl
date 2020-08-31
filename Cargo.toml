@@ -1,8 +1,13 @@
 [package]
 name = "dawctl"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["João M. Bezerra <marcospb19@hotmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "Razer Deathadder White Edition mouse device manager."
+repository = "https://github.com/marcospb19/dawctl"
+categories = ["command-line-utilities", "hardware-support"]
+keywords = ["razer", "mouse", "mice", "deathadder", "hardware"]
 
 [dependencies]
 libc = "0.2.76"
