@@ -10,8 +10,8 @@ type Result<T> = std::result::Result<T, std::io::Error>;
 
 impl DeathAdderWhite {
     // Return instance of DeathAdderWhite
-    // Try to find path from --path flag, if it isn't set, search for id_vendor and id_product
-    // using libudev functions
+    // Try to find path from --path flag, if it isn't set, search for id_vendor and
+    // id_product using libudev functions
     pub fn new(path_flag: Option<&str>, id_vendor: &str, id_product: &str) -> Result<Self> {
         let udev_context = &libudev::Context::new()?;
         let mut enumerator = libudev::Enumerator::new(&udev_context)?;
@@ -112,11 +112,59 @@ impl DeathAdderWhite {
 
         // Command sequence to change brightness
         let cmd: Vec<u8> = vec![0x03, 0x0f, 0x04, 0x01, 0x00];
-        // Now transform from [0-100] to [0-255], and send it to the mouse
-        let brightness: u8 = (brightness as f64 * 255.0 / 100.0) as u8;
-        // Command footer
+
+        // Confusing math ahead!!!!!!!
+        // Please, read the comments to understand it.
+        //
+        // We receive the brightness_level in the range [0-100], but the device receives
+        // it in the range [0-255], so we need to translate it, this means that we'll
+        // have gaps, the synapse code just skips numbers in a step of size 2.55 and
+        // assumes everything is just fine.
+        //
+        // We, however will be more thoughtful of our actions
+        //
+        // If you mess with the light values, you'll notice a very large difference
+        // between low values and little to no difference from [50-100], with this in
+        // mind, we'll make a transformation using an exponential function to make a
+        // translation in the following way:
+        //
+        // The start of the sequence grows as slowly as possible (1 by 1) and then the
+        // sequence starts to slowly speed up it's growth.
+        //
+        // This way, we give the user a chance to choose with precision low values where
+        // if the level changes by 1, the difference is noticeable, in exchange of the
+        // precision at the end of the sequence (closer to 255), where the level changes
+        // makes almost no visible difference.
+        //
+        //
+        // Before: [0, 1, 2, 3, 4 ... 57, 58, 59,  60 ...  96,  97,  98,  99, 100]
+        // After:  [0, 1, 2, 3, 4 ... 92, 94, 97, 100 ... 235, 240, 245, 250, 255]
+        //
+        //                                 ↓ Here, about 2.7 growth rate
+        // Growth: [_, 1, 1, 1, 1 ...  3,  2,  3,   3 ...   5,   5,   5,   5,   5]
+        //
+        // The exp function, by default, will generate a sequence that starts fast and
+        // slows at the end, because we want the other way around, se let's start with
+        // `100 - level` to reverse it to fit our need
+        let level = 100 - brightness;
+
+        // Scale it down, value is between 0.00 and 1.00
+        let level: f64 = level as f64 / 100.0;
+
+        // Exponential function that eases stuff. And the multiplication forces the
+        // sequence end to converge exactly to 0, now the range ends are really aligned
+        let level: f64 = (level * -1.07f64).exp() * (-level + 1.0);
+
+        // Now we can scale it up again, and round the value. The rounded value will go
+        // exactly to the bits we wanted, this was carefully picked up.
+        // One more hidden detail, the true sequence starts at 2 instead of 1, so we'll
+        // use 254 and add 1, instead of using 255
+        let level: u8 = (level * 254.0).round() as u8 + 1;
+
+        // Get new value and move on :D
+        let brightness = level;
+
         let footer = brightness ^ 0x09;
-        // Communicate
         self.send_cmd(cmd, vec![brightness], footer);
     }
 
