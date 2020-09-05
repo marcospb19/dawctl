@@ -27,10 +27,10 @@ impl DeathAdderWhite {
                 if let Some(usb_parent) = device.parent_with_subsystem_devtype("usb", "usb_device") {
                     let device_id_vendor = usb_parent
                         .attribute_value("idVendor")
-                        .expect("Error: unable to read the device tidVendor.");
+                        .expect("Error: unable to read the device idVendor.");
                     let device_id_product = usb_parent
                         .attribute_value("idProduct")
-                        .expect("Error: unable to read the device tidProduct.");
+                        .expect("Error: unable to read the device idProduct.");
                     if device_id_vendor == id_vendor && device_id_product == id_product {
                         println!("Found!");
                         option_path = Some(PathBuf::from(device.devnode().unwrap()));
@@ -185,7 +185,7 @@ impl DeathAdderWhite {
         buf.push(footer);
         buf.push(0x00);
 
-        // Try 4 times to comunicate with the device successfully.
+        // Try 4 times to communicate with the device successfully.
         // If no success, exit.
         for _ in 0..4 {
             unsafe {
@@ -197,9 +197,9 @@ impl DeathAdderWhite {
                 }
 
                 // Communication: receive response from mouse
+                // We are overwriting the same buffer used for sending the message
                 if let Err(err) = usbhid_communication::gfeature(self.file_descriptor, buf.as_mut_ptr(), buf.len()) {
                     eprintln!("USBHID_IOCGFEATURE: {}", err.to_string());
-                    eprintln!("error, trying again maybe this time it'll work shit");
                     continue;
                 }
             }
