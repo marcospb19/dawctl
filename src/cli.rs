@@ -13,7 +13,7 @@ pub(crate) fn parse_args() -> clap::ArgMatches<'static> {
                 .long("--dpi")
                 .short("-d")
                 .value_name("DPI")
-                .help("Sensor DPI (200 up to 6400)."),
+                .help("Sensor DPI, multiples of 100. [200-6400]"),
         )
         .arg(
             Arg::with_name("path")
@@ -34,8 +34,9 @@ pub(crate) fn parse_args() -> clap::ArgMatches<'static> {
                 .long("--frequency")
                 .short("-f")
                 .value_name("FREQUENCY")
-                .help("Sensor frequency in Hz.")
-                .possible_values(&["500", "1000"]),
+                .help("Sensor frequency in Hz. [500 or 1000]")
+                .possible_values(&["500", "1000"])
+                .hide_possible_values(true),
         )
         .get_matches()
 }
