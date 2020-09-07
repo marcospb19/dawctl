@@ -1,6 +1,6 @@
 [package]
 name = "dawctl"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["João M. Bezerra <marcospb19@hotmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -14,3 +14,6 @@ libc = "0.2.76"
 nix = "0.8"
 clap = { version = "2.33", features = ["wrap_help"] }
 libudev = { git = "https://github.com/9ary/libudev-rs", rev = "cf7dd72" }
+
+[profile.release]
+opt-level = "z"
