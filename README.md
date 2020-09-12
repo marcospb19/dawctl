@@ -13,14 +13,15 @@ Features:
   - `-f --frequency`: Change sensor frequency, 500 Hz or 1000 Hz.
   - `-p --path`: Path to the device, overwrites the automatic detection feature.
 
-Is worth saying that our `--light` parameter allows for better ranges than Razer Synapse's one, for the lower values :D (if you're like batman and you stay up until absolute darkness, you'll love this).
+I'm proud to say that our `--light` parameter allows for better ranges than Razer Synapse's one! For the lower values you have more options to choose :D (if you're like batman and you stay up until absolute darkness, you'll love this).
 
 ---
 
-Lighting (0% and 56%):
+Lighting (0%, 7% and 70%):
 <p float="left">
-  <img src="https://user-images.githubusercontent.com/38900226/91668112-36221a80-eae0-11ea-8598-c03c9168812c.png" width="30%" />
-  <img src="https://user-images.githubusercontent.com/38900226/91668105-27d3fe80-eae0-11ea-8bae-2cceb886cf92.png" width="30%" />
+  <img src="https://i.imgur.com/8XviPEf.jpg" width="31%" />
+  <img src="https://i.imgur.com/MkZTpcB.jpg" width="31%" />
+  <img src="https://i.imgur.com/Arrm9SC.jpg" width="31%" />
 </p>
 
 TODO:
