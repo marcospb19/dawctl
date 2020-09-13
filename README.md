@@ -28,7 +28,7 @@ TODO:
 - Query subcommand! (but get information about current parameters).
 - Breathing ligthing effect! (and others, like blinking in specific intervals, X times).
 - Updating `nix` version to latest (ioctl changes).
-- Test if works on big-endian machines, (Sadly I don't have any here).
+- Test on a big-endian machine.
 
 ### Installation
 Note 1: this section does not cover how to compile `dawctl`, as it's the same procedure for every Rust project.

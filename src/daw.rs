@@ -163,8 +163,9 @@ impl DeathAdderWhite {
 
         // Get new value and move on :D
         let brightness = level;
+        println!("{}", brightness);
 
-        let footer = brightness ^ 0x09;
+        let footer = brightness.to_le_bytes()[0] ^ 0x09;
         self.send_cmd(cmd, vec![brightness], footer);
     }
 
@@ -178,11 +179,15 @@ impl DeathAdderWhite {
         // = 6
         let zeros = vec![0x00; 6];
         buf.extend(zeros);
-        buf.extend(&cmd);
-        buf.extend(args);
+        for cmd_byte in &cmd {
+            buf.push(cmd_byte.to_le_bytes()[0]);
+        }
+        for arg_byte in &args {
+            buf.push(arg_byte.to_le_bytes()[0]);
+        }
         let zeros = vec![0x00; 89 - buf.len()];
         buf.extend(zeros);
-        buf.push(footer);
+        buf.push(footer.to_le_bytes()[0]);
         buf.push(0x00);
 
         // Try 4 times to communicate with the device successfully.
