@@ -10,7 +10,7 @@ categories = ["command-line-utilities", "hardware-support"]
 keywords = ["razer", "mouse", "mice", "deathadder", "hardware"]
 
 [dependencies]
-libc = "0.2.76"
+libc = "0.2"
 nix = "0.8.1"
 clap = { version = "2.33.1", features = ["wrap_help"] }
 libudev = { git = "https://github.com/9ary/libudev-rs", rev = "cf7dd72" }
