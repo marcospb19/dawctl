@@ -1,11 +1,11 @@
 # Dawctl
 Super simple, minimal, and fast CLI device manager to control Razer's Deathadder Essential White Edition mouse **parameters** in _Linux_.
 
-The software itself is 100% written in Rust, Python was used only for data analysis in the reverse engineering process (more about it at the end of this file).
+Basically... my mouse.
 
-It's called dawctl because it is a controller (ctl) for the Deathadder White edition (DAW, for short).
+Written in Rust, used Python for data analysis while reverse engineering proprietary Razer software.
 
-Features:
+## Features:
 - Automatic detection of the DAW, if plugged in ;).
 - Flags:
   - `-d --dpi`: Change the sensor DPI, from 200 up to 6400.
@@ -13,7 +13,11 @@ Features:
   - `-f --frequency`: Change sensor frequency, 500 Hz or 1000 Hz.
   - `-p --path`: Path to the device, overwrites the automatic detection feature.
 
-I'm proud to say that our `--light` parameter allows for better ranges than Razer Synapse's one! For the lower values you have more options to choose :D (if you're like batman and you stay up until absolute darkness, you'll love this).
+By reverse engineering light values, I found out that the default presetted slider in Razer Synapse is limited and skips values, I have made some math magic and now we can achieve lower and more detailed levels of luminosity.
+
+This is very convenient to people that stay up until it's very late, cause now you can set the lower values without going blind!
+
+Damn I love this so much, it was worth it.
 
 ---
 
@@ -24,45 +28,35 @@ Lighting (0%, 7% and 70%):
   <img src="https://i.imgur.com/Arrm9SC.jpg" width="31%" />
 </p>
 
-TODO:
-- Query subcommand! (but get information about current parameters).
-- Breathing ligthing effect! (and others, like blinking in specific intervals, X times).
+## Unimplemented:
+- Query subcommand to get information about current mouse parameters, instead of just overwritting them.
+- Breathing ligthing effect, it's not hard to implement, but I don't feel like I really need it xD.
 - Updating `nix` version to latest (ioctl changes).
 - Test on a big-endian machine.
 
-### Installation
-Note 1: this section does not cover how to compile `dawctl`, as it's the same procedure for every Rust project.
-Note 2: libc is a dependency, but it's probably installed in your machine ('libc.so.6').
+## Installation from pre-built binary
+Note: `libc` is a dependency but should be already installed.
 
-- Steps
-  - Step 1: Grab a binary from the `releases section` (around 800 KB) on github and download it.
-  - Step 2: Move it to `/usr/bin/dawctl` to install it in the system (requires sudo).
+ - Step 1: Grab a binary from the `releases section` (around 800 KB) on github and download it.
+ - Step 2: Move it to `/usr/bin/dawctl` to install it in the system (requires sudo).
 
-Done! Well... almost. Now the script is available for all users, but Linux won't give permission for any user to communicate freely with the hardware, you would need to type `sudo` every time, however, you can create an exception by adding a "rule", here's how it works:
-
+We're almost done. Now the script is available for all users, but Linux will block USB communication without having permissions, you would need to type `sudo` every time, the solutions is creating an exception by adding a "rule" to dawctl talk with the mouse:
+  
+  - Step 3: 
 Create a file, at `/etc/udev/rules.d/99-hidraw-permissions.rules`, and copy this:
 ```py
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664", GROUP="wheel"
 ```
 
-This adds the permission to all users in the group `wheel`, by default (in many distributions) your personal user is already included! Users that can type `sudo` are inside of the `wheel` group, `hidraw` is the Linux way to enable usbHID RAW communication.
+Now every user in the group `wheel` can talk with the mouse (your user is probably already in `wheel`!) via `hidraw`, that is, usbHID RAW communication.
 
-Now, you need to update kernel events:
+Final step, update kernel event triggers:
 ```sh
 sudo udevadm control --reload
 sudo udevadm trigger
 ```
 
-### simplified list of commands
-After you installed the binary from https://github.com/marcospb19/dawctl/releases/latest at /usr/bin/dawctl.
-```sh
-sudo -c 'echo KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664", GROUP="wheel"' > /etc/udev/rules.d/99-hidraw-permissions.rules
-sudo udevadm control --reload
-sudo udevadm trigger
-dawctl --help
-```
-
-### Help (v0.1)
+### Help (v0.1) (TODO: update picture to 0.2)
 ![help_image](https://user-images.githubusercontent.com/38900226/91664272-72e01880-eac4-11ea-8a41-8f03c463c520.png)
 
 ### Examples
@@ -77,28 +71,32 @@ dawctl --frequency 1000
 ---
 
 ## Extra info about this project:
-### How was this created?
+### Why was this created?
 
-I started this project because I really needed to control the DPI on my mouse, and I wanted to turn off this lights so I won't go blind.
+I started this project because I needed to change the crazy DPI value of my mouse, and I wanted to turn off the lights so I won't go blind.
 
-This manager was made by reverse engineering of the official razer synapse USBHID communication, using wireshark and exporting captures via .JSON, then using the files for analysis written in Python, scripts are in the folder reverse\_engineering/.
+This manager was made by reverse engineering of the official razer synapse USBHID communication, using wireshark and exporting captures via `.JSON`, then displaying the bytes using Python, so then I had to understand what those byte packages meant, I already had a hint from [@9ary](https://github.com/9ary) that some information on the packages go on the top, and there's a footer byte at the end.
 
-The hardest part of this project (in the view of someone that knows nothing about USBHID raw communication in Linux), comes from https://github.com/9ary/da2013ctl, without `9ary`, I wouldn't be able to lie on top of his abstraction and spend my time in the reverse engineering process.
+Python scripts for printing 1s and 0s are in the folder `reverse\_engineering/`.
 
-In case you're confused, `9ary` did a great job with `da2013ctl`, but it won't work with the DAW because the device interface and the hardware features are different from those versions.
+There's still one thing that I don't understand, and I expected to not understand it cause I never knew that USBHID existed (to me USBs just worked because YES), and this thing is a dark magic macro by https://github.com/9ary/da2013ctl that actually sends the packages, using the `nix` library, so ty [@9ary](https://github.com/9ary) for letting me be able to lie on top of your abstraction and focus my time in the reverse engineering process, he's some sort of USB protocols expert so check him out and hire him lol.
+
+This is the project that I've had most fun working on.
+
+### About alternatives
+There are some huge Razer Synapse reverse engineer C projects (razercfg) that already had support for the `daw`, but I found it so confusing to use that I thought it was better to create my own.
 
 ### Why isn't it in crates.io?
-Sadly, it is currently [not possible](https://github.com/dcuddeback/libudev-rs/pull/10#issuecomment-683534098) because I need `libudev` from a specific commit because the API wasn't correctly exposed.
-
-### What about razercfg?
-I seeker in source files and I think that it does not supports the DAW, but honestly, I'm not even capable of making that run in my machine.
+It is currently not possible, because we use a dependency from a specific git tree that is non-published.
 
 ---
 
 ## Helping
-If you like my project, thank!, it is very easy to help me, here are some options:
+If you like my project, it is very easy to help me, here are some options:
 
 1. Giving a star and sharing this software with someone that might be interested in.
 2. Help me improve this README (I would really appreciate it).
 3. You can create an issue here for any reason, even if you just want to ask a question.
 4. Helping with code, debugging, or reporting errors.
+
+Thanks!
