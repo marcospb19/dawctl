@@ -1,5 +1,5 @@
 # Dawctl
-Super simple, minimal, and fast CLI device manager to control Razer's Deathadder Essential White Edition mouse **parameters** in _Linux_.
+Super simple and instant CLI device manager to control Razer's Deathadder Essential White Edition mouse **parameters** in _Linux_.
 
 Basically... my mouse.
 
