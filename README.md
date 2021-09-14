@@ -17,7 +17,7 @@ By reverse engineering light values, I found out that the default presetted slid
 
 This is very convenient to people that stay up until it's very late, cause now you can set the lower values without going blind!
 
-Damn I love this so much, it was worth it.
+It was worth it.
 
 ---
 
@@ -40,21 +40,7 @@ Note: `libc` is a dependency but should be already installed.
  - Step 1: Grab a binary from the `releases section` (around 800 KB) on github and download it.
  - Step 2: Move it to `/usr/bin/dawctl` to install it in the system (requires sudo).
 
-We're almost done. Now the script is available for all users, but Linux will block USB communication without having permissions, you would need to type `sudo` every time, the solutions is creating an exception by adding a "rule" to dawctl talk with the mouse:
-  
-  - Step 3: 
-Create a file, at `/etc/udev/rules.d/99-hidraw-permissions.rules`, and copy this:
-```py
-KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664", GROUP="wheel"
-```
-
-Now every user in the group `wheel` can talk with the mouse (your user is probably already in `wheel`!) via `hidraw`, that is, usbHID RAW communication.
-
-Final step, update kernel event triggers:
-```sh
-sudo udevadm control --reload
-sudo udevadm trigger
-```
+If you want to run it without sudo, [see this](https://github.com/marcospb19/dawctl/wiki/Running-without-sudo).
 
 ### Help (v0.1) (TODO: update picture to 0.2)
 ![help_image](https://user-images.githubusercontent.com/38900226/91664272-72e01880-eac4-11ea-8a41-8f03c463c520.png)
