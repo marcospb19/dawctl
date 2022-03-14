@@ -1,8 +1,6 @@
 # Dawctl
 Super simple and instant CLI device manager to control Razer's Deathadder Essential White Edition mouse **parameters** in _Linux_.
 
-Basically... my mouse.
-
 Written in Rust, used Python for data analysis while reverse engineering proprietary Razer software.
 
 ## Features:
@@ -70,7 +68,7 @@ There's still one thing that I don't understand, and I expected to not understan
 This is the project that I've had most fun working on.
 
 ### About alternatives
-There are some huge Razer Synapse reverse engineer C projects (razercfg) that already had support for the `daw`, but I found it so confusing to use that I thought it was better to create my own.
+There are some huge Razer Synapse reverse engineer C projects (like [`razercfg`](https://github.com/mbuesch/razer)) that already had support for the `daw`, but I found it so confusing to use that I thought it was better to create my own.
 
 ### Why isn't it in crates.io?
 It is currently not possible, because we use a dependency from a specific git tree that is non-published.
