@@ -32,7 +32,7 @@ impl DeathAdderWhite {
                         .attribute_value("idProduct")
                         .expect("Error: unable to read the device idProduct.");
                     if device_id_vendor == id_vendor && device_id_product == id_product {
-                        println!("Found!");
+                        // println!("Found!");
                         option_path = Some(PathBuf::from(device.devnode().unwrap()));
                         break;
                     }
@@ -173,7 +173,7 @@ impl DeathAdderWhite {
 
         // Get new value and move on :D
         let brightness = level;
-        println!("{}", brightness);
+        // println!("{}", brightness);
 
         let footer = brightness.to_le_bytes()[0] ^ 0x09;
         self.send_cmd(cmd, vec![brightness], footer);
@@ -222,7 +222,7 @@ impl DeathAdderWhite {
                 // Check if device responded successfully
                 // We expect the same values as librazer/razercfg does
                 0..=3 => {
-                    println!("DONE!");
+                    // println!("DONE!");
                     return;
                 }
                 other => eprintln!(
