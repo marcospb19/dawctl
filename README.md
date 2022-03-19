@@ -40,6 +40,10 @@ Note: `libc` is a dependency but should be already installed.
 
 If you want to run it without sudo, [see this](https://github.com/marcospb19/dawctl/wiki/Running-without-sudo).
 
+## Dependencies for building
+
+- [libudev](https://github.com/dcuddeback/libudev-sys)
+
 ### Help (v0.1) (TODO: update picture to 0.2)
 ![help_image](https://user-images.githubusercontent.com/38900226/91664272-72e01880-eac4-11ea-8a41-8f03c463c520.png)
 
