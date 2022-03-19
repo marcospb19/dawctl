@@ -34,4 +34,7 @@ fn main() {
     if let Some(frequency) = flags.value_of("frequency") {
         mouse.set_frequency(frequency);
     }
+    if flags.is_present("breath") {
+        mouse.run_breath_effect();
+    }
 }

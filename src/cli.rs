@@ -38,5 +38,11 @@ pub(crate) fn parse_args() -> clap::ArgMatches<'static> {
                 .possible_values(&["500", "1000"])
                 .hide_possible_values(true),
         )
+        .arg(
+            Arg::with_name("breath")
+                .long("--breath")
+                .short("-b")
+                .help("Lighting breath effect."),
+        )
         .get_matches()
 }

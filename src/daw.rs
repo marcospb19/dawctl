@@ -1,6 +1,6 @@
 use super::usbhid_communication;
 use nix::{fcntl, sys::stat::Mode, unistd};
-use std::{os::unix::io, path::PathBuf, process};
+use std::{os::unix::io, path::PathBuf, process, thread::sleep, time::Duration};
 
 pub struct DeathAdderWhite {
     file_descriptor: io::RawFd,
@@ -98,6 +98,16 @@ impl DeathAdderWhite {
         self.send_cmd(cmd, vec![frequency], footer);
     }
 
+    pub fn run_breath_effect(&self) {
+        loop {
+            for i in (0..100).chain((0..100).rev()) {
+                sleep(Duration::from_millis(30));
+                self.set_brightness(i.to_string().as_str());
+            }
+            sleep(Duration::from_millis(30));
+        }
+    }
+
     pub fn set_brightness(&self, brightness_flag: &str) {
         // Brightness level goes from (0 up to 100)
         let brightness: u64 = brightness_flag.parse().unwrap_or_else(|err| {
@@ -169,7 +179,7 @@ impl DeathAdderWhite {
         self.send_cmd(cmd, vec![brightness], footer);
     }
 
-    pub fn send_cmd(&self, cmd: Vec<u8>, args: Vec<u8>, footer: u8) {
+    fn send_cmd(&self, cmd: Vec<u8>, args: Vec<u8>, footer: u8) {
         // Buffer used to communicate
         let mut buf = Vec::with_capacity(256);
 
