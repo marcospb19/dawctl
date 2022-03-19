@@ -1,26 +1,35 @@
-use super::usbhid_communication;
+use crate::{runtime_error, usbhid_communication};
 use nix::{fcntl, sys::stat::Mode, unistd};
-use std::{os::unix::io, path::PathBuf, process, thread::sleep, time::Duration};
+use std::{ffi::OsStr, io, os::unix, path::PathBuf, thread::sleep, time::Duration};
 
 pub struct DeathAdderWhite {
-    file_descriptor: io::RawFd,
+    file_descriptor: unix::io::RawFd,
 }
 
-type Result<T> = std::result::Result<T, std::io::Error>;
+// Ids to search when automatically finding plugged DeathAdderWhite
+// Change this fields if necessary
+const ID_VENDOR: &str = "1532";
+const ID_PRODUCT: &str = "0071";
 
 impl DeathAdderWhite {
     // Return instance of DeathAdderWhite
-    // Try to find path from --path flag, if it isn't set, search for id_vendor and
-    // id_product using libudev functions
-    pub fn new(path_flag: Option<&str>, id_vendor: &str, id_product: &str) -> Result<Self> {
+    //
+    // Tries to detect mouse device by ID_VENDOR and ID_PRODUCT using libudev
+    // functions.
+    //
+    // But the path can be overwritten by --path flag.
+    pub fn new<O>(path_flag: Option<O>) -> io::Result<Self>
+    where
+        O: AsRef<OsStr>,
+    {
         let udev_context = &libudev::Context::new()?;
-        let mut enumerator = libudev::Enumerator::new(&udev_context)?;
+        let mut enumerator = libudev::Enumerator::new(udev_context)?;
 
         // Apply a filter for the enumerator
         enumerator.match_subsystem("hidraw")?;
 
         let mouse_device_path = if let Some(path) = path_flag {
-            PathBuf::from(path)
+            PathBuf::from(path.as_ref())
         } else {
             let mut option_path: Option<PathBuf> = None;
             for device in enumerator.scan_devices()? {
@@ -31,7 +40,7 @@ impl DeathAdderWhite {
                     let device_id_product = usb_parent
                         .attribute_value("idProduct")
                         .expect("Error: unable to read the device idProduct.");
-                    if device_id_vendor == id_vendor && device_id_product == id_product {
+                    if device_id_vendor == ID_VENDOR && device_id_product == ID_PRODUCT {
                         // println!("Found!");
                         option_path = Some(PathBuf::from(device.devnode().unwrap()));
                         break;
@@ -41,7 +50,7 @@ impl DeathAdderWhite {
             if let Some(found_path) = option_path {
                 found_path
             } else {
-                eprintln!("Error: dawctl was unable to detect the device hidraw node with udev, make sure it's \
+                runtime_error!("Error: dawctl was unable to detect the device hidraw node with udev, make sure it's \
                           plugged in.\n\
                           You can also specify it's path using the flag --path, install.\n\
                           \n\
@@ -50,34 +59,24 @@ impl DeathAdderWhite {
                           this value may vary for different mice devices. If `lsusb` don't list Razer DeathAdder, it\
                           means it's not connected, if this appears but with different code, please open an issue on\
                           the problem (https://github.com/marcospb19/dawctl).");
-
-                process::exit(1);
             }
         };
 
         let file_descriptor =
             fcntl::open(&mouse_device_path, nix::fcntl::O_RDWR, Mode::empty()).unwrap_or_else(|err| {
-                eprintln!("Failed to open device: {}", err.to_string());
-                process::exit(1);
+                runtime_error!("Failed to open device: {}", err.to_string());
             });
 
         Ok(DeathAdderWhite { file_descriptor })
     }
 
-    pub fn set_dpi(&self, dpi_flag: &str) {
-        let dpi: u16 = dpi_flag.parse().unwrap_or_else(|err| {
-            eprintln!("Error: Unable to parse integer value for dpi_level: {}", err);
-            process::exit(1);
-        });
-
-        if !(dpi >= 200 && dpi <= 6400) {
-            eprintln!("Error: DPI_LEVEL isn't in the valid interval [200-6400]: '{}'", dpi);
-            process::exit(1);
+    pub fn set_dpi(&self, dpi: u16) {
+        if !(200..=6400).contains(&dpi) {
+            runtime_error!("Error: DPI_LEVEL isn't in the valid interval [200-6400]: '{}'", dpi);
         }
 
-        if !(dpi % 100 == 0) {
-            eprintln!("Error: DPI_LEVEL isn't a multiple of 100: '{}'.", dpi);
-            process::exit(1);
+        if dpi % 100 != 0 {
+            runtime_error!("Error: DPI_LEVEL isn't a multiple of 100: '{}'.", dpi);
         }
 
         let cmd: Vec<u8> = vec![0x07, 0x04, 0x05, 0x01];
@@ -87,13 +86,14 @@ impl DeathAdderWhite {
         self.send_cmd(cmd, args, footer);
     }
 
-    pub fn set_frequency(&self, frequency_flag: &str) {
+    pub fn set_frequency(&self, frequency_flag: u16) {
         // Sequence of bytes to
         let cmd: Vec<u8> = vec![0x07, 0x04, 0x05, 0x01];
         // Bytes for frequency argument and each sequence footer
         let (frequency, footer) = match frequency_flag {
-            "500" => (0x02, 0x06),
-            "1000" | _ => (0x01, 0x05),
+            500 => (0x02, 0x06),
+            1000 => (0x01, 0x05),
+            _ => unreachable!(),
         };
         self.send_cmd(cmd, vec![frequency], footer);
     }
@@ -102,22 +102,15 @@ impl DeathAdderWhite {
         loop {
             for i in (0..100).chain((0..100).rev()) {
                 sleep(Duration::from_millis(30));
-                self.set_brightness(i.to_string().as_str());
+                self.set_brightness(i);
             }
             sleep(Duration::from_millis(30));
         }
     }
 
-    pub fn set_brightness(&self, brightness_flag: &str) {
-        // Brightness level goes from (0 up to 100)
-        let brightness: u64 = brightness_flag.parse().unwrap_or_else(|err| {
-            eprintln!("Error: Unable to parse integer value for brightness_level: {}", err);
-            process::exit(1);
-        });
-
-        if !(brightness <= 100) {
-            eprintln!("Error: Brightness level '{}' is out of the range [0,100].", brightness);
-            process::exit(1);
+    pub fn set_brightness(&self, brightness: u16) {
+        if brightness > 100 {
+            runtime_error!("Error: Brightness level '{}' is out of the range [0,100].", brightness);
         }
 
         // Command sequence to change brightness
@@ -206,7 +199,7 @@ impl DeathAdderWhite {
             unsafe {
                 // Send command to DeathAdder, skip if error
                 if let Err(err) = usbhid_communication::sfeature(self.file_descriptor, buf.as_mut_ptr(), buf.len()) {
-                    eprintln!("USBHID_IOCSFEATURE: {}", err.to_string());
+                    eprintln!("USBHID_IOCSFEATURE: {}", err);
                     eprintln!("error, trying again maybe this time it'll work shit");
                     continue;
                 }
@@ -214,7 +207,7 @@ impl DeathAdderWhite {
                 // Communication: receive response from mouse
                 // We are overwriting the same buffer used for sending the message
                 if let Err(err) = usbhid_communication::gfeature(self.file_descriptor, buf.as_mut_ptr(), buf.len()) {
-                    eprintln!("USBHID_IOCGFEATURE: {}", err.to_string());
+                    eprintln!("USBHID_IOCGFEATURE: {}", err);
                     continue;
                 }
             }

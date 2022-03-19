@@ -12,8 +12,8 @@ keywords = ["razer", "mouse", "mice", "deathadder", "hardware"]
 [dependencies]
 libc = "0.2"
 nix = "0.8.1"
-clap = { version = "2.33.1", features = ["wrap_help"] }
 libudev = { git = "https://github.com/9ary/libudev-rs", rev = "cf7dd72" }
+clap = { version = "3.1.6", features = ["atty", "derive", "wrap_help"] }
 
 [profile.release]
 opt-level = "s"
