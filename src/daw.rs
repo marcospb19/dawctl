@@ -1,6 +1,8 @@
-use crate::{runtime_error, usbhid_communication};
-use nix::{fcntl, sys::stat::Mode, unistd};
 use std::{ffi::OsStr, io, os::unix, path::PathBuf, thread::sleep, time::Duration};
+
+use nix::{fcntl, sys::stat::Mode, unistd};
+
+use crate::{runtime_error, usbhid_communication};
 
 pub struct DeathAdderWhite {
     file_descriptor: unix::io::RawFd,
