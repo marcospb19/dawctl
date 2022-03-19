@@ -1,1 +1,1 @@
-KERNEL=="hidraw*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0071", GROUP="razer", MODE="0660"
+KERNEL=="hidraw*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0071", GROUP="razer", MODE="0666"
