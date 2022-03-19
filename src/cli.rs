@@ -9,7 +9,7 @@ impl Args {
 
 #[derive(Parser, Debug)]
 pub struct Args {
-    /// Sensor DPI, multiples of 100. [200-6400].
+    /// Sensor DPI, multiples of 100. [200-6400]
     #[clap(short, long, value_name = "DPI")]
     pub dpi: Option<u16>,
 
@@ -25,7 +25,7 @@ pub struct Args {
     #[clap(short, long)]
     pub breath: bool,
 
-    /// Path to the hidraw node. (example: /dev/hidraw3).
+    /// Path to the hidraw node. [example: /dev/hidraw3]
     #[clap(short, long, value_name = "PATH")]
     pub path: Option<OsString>,
 }
