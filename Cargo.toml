@@ -2,7 +2,7 @@
 name = "dawctl"
 version = "0.2.2"
 authors = ["João M. Bezerra <marcospb19@hotmail.com>"]
-edition = "2018"
+edition = "2021"
 license = "MIT"
 description = "Razer Deathadder White Edition mouse device manager."
 repository = "https://github.com/marcospb19/dawctl"

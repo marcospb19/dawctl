@@ -1,4 +1,4 @@
-max_width = 120
+max_width = 100
 unstable_features = true
 format_strings = true
 wrap_comments = true

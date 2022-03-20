@@ -35,7 +35,8 @@ impl DeathAdderWhite {
         } else {
             let mut option_path: Option<PathBuf> = None;
             for device in enumerator.scan_devices()? {
-                if let Some(usb_parent) = device.parent_with_subsystem_devtype("usb", "usb_device") {
+                if let Some(usb_parent) = device.parent_with_subsystem_devtype("usb", "usb_device")
+                {
                     let device_id_vendor = usb_parent
                         .attribute_value("idVendor")
                         .expect("Error: unable to read the device idVendor.");
@@ -64,8 +65,8 @@ impl DeathAdderWhite {
             }
         };
 
-        let file_descriptor =
-            fcntl::open(&mouse_device_path, nix::fcntl::O_RDWR, Mode::empty()).unwrap_or_else(|err| {
+        let file_descriptor = fcntl::open(&mouse_device_path, nix::fcntl::O_RDWR, Mode::empty())
+            .unwrap_or_else(|err| {
                 runtime_error!("Failed to open device: {}", err.to_string());
             });
 
@@ -74,7 +75,10 @@ impl DeathAdderWhite {
 
     pub fn set_dpi(&self, dpi: u16) {
         if !(200..=6400).contains(&dpi) {
-            runtime_error!("Error: DPI_LEVEL isn't in the valid interval [200-6400]: '{}'", dpi);
+            runtime_error!(
+                "Error: DPI_LEVEL isn't in the valid interval [200-6400]: '{}'",
+                dpi
+            );
         }
 
         if dpi % 100 != 0 {
@@ -112,7 +116,10 @@ impl DeathAdderWhite {
 
     pub fn set_brightness(&self, brightness: u16) {
         if brightness > 100 {
-            runtime_error!("Error: Brightness level '{}' is out of the range [0,100].", brightness);
+            runtime_error!(
+                "Error: Brightness level '{}' is out of the range [0,100].",
+                brightness
+            );
         }
 
         // Command sequence to change brightness
@@ -200,7 +207,11 @@ impl DeathAdderWhite {
         for _ in 0..4 {
             unsafe {
                 // Send command to DeathAdder, skip if error
-                if let Err(err) = usbhid_communication::sfeature(self.file_descriptor, buf.as_mut_ptr(), buf.len()) {
+                if let Err(err) = usbhid_communication::sfeature(
+                    self.file_descriptor,
+                    buf.as_mut_ptr(),
+                    buf.len(),
+                ) {
                     eprintln!("USBHID_IOCSFEATURE: {}", err);
                     eprintln!("error, trying again maybe this time it'll work shit");
                     continue;
@@ -208,7 +219,11 @@ impl DeathAdderWhite {
 
                 // Communication: receive response from mouse
                 // We are overwriting the same buffer used for sending the message
-                if let Err(err) = usbhid_communication::gfeature(self.file_descriptor, buf.as_mut_ptr(), buf.len()) {
+                if let Err(err) = usbhid_communication::gfeature(
+                    self.file_descriptor,
+                    buf.as_mut_ptr(),
+                    buf.len(),
+                ) {
                     eprintln!("USBHID_IOCGFEATURE: {}", err);
                     continue;
                 }
@@ -221,7 +236,8 @@ impl DeathAdderWhite {
                     return;
                 }
                 other => eprintln!(
-                    "Command failed: Device did not answered what we expected: '{}'.\ncmd_bytes: {:#?}",
+                    "Command failed: Device did not answered what we expected: '{}'.\ncmd_bytes: \
+                     {:#?}",
                     other, cmd
                 ),
             }
